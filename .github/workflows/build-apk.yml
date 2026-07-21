@@ -27,7 +27,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Install npm packages
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Add Android platform (Capacitor)
         run: npx cap add android
