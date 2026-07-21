@@ -19,9 +19,13 @@
 
   if(!isNativeApp()) return; // Kwenye browser ya kawaida, tumia speechSynthesis halisi
 
+  let attempts = 0;
   function install(){
     if(!ready()){
-      // Plugin bado haijasajiliwa na Capacitor bridge, jaribu tena punde
+      attempts++;
+      if(attempts === 15){ // ~3 sekunde zimepita bila plugin kuonekana
+        alert('DEBUG: plugin ya TextToSpeech haijaonekana kwenye window.Capacitor.Plugins baada ya sekunde 3. Capacitor.Plugins ina: ' + (window.Capacitor && window.Capacitor.Plugins ? Object.keys(window.Capacitor.Plugins).join(', ') : 'window.Capacitor haipo kabisa'));
+      }
       setTimeout(install, 200);
       return;
     }
@@ -68,6 +72,7 @@
           if(utter.onend) utter.onend();
         }).catch(function(err){
           window.speechSynthesis.speaking = false;
+          alert('DEBUG: TTS.speak() imeshindwa: ' + (err && err.message ? err.message : JSON.stringify(err)));
           if(utter.onerror) utter.onerror(err);
         });
       }
