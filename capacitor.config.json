@@ -1,0 +1,6 @@
+{
+  "appId": "com.jpplayer.app",
+  "appName": "JP Player",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
