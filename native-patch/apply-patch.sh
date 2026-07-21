@@ -37,10 +37,11 @@ else:
     print("Ruhusa tayari zipo, hakuna kilichobadilika.")
 PYEOF
 
-echo "==> Kunakili media-scanner-bridge.js kama faili tofauti ndani ya www/"
+echo "==> Kunakili media-scanner-bridge.js na native-tts-shim.js kama faili tofauti ndani ya www/"
 cp native-patch/media-scanner-bridge.js www/media-scanner-bridge.js
+cp native-patch/native-tts-shim.js www/native-tts-shim.js
 
-echo "==> Kuongeza <script src> moja tu kabla ya </body> (njia salama, haiguzi JS)"
+echo "==> Kuongeza tags za <script src> kabla ya </body> (njia salama, haiguzi JS)"
 python3 - <<'PYEOF'
 path = "www/index.html"
 with open(path, encoding="utf-8") as f:
@@ -48,14 +49,18 @@ with open(path, encoding="utf-8") as f:
 
 marker = "media-scanner-bridge.js"
 if marker not in html:
-    tag = '<script src="media-scanner-bridge.js"></script>\n</body>'
+    tag = (
+        '<script src="native-tts-shim.js"></script>\n'
+        '<script src="media-scanner-bridge.js"></script>\n'
+        '</body>'
+    )
     if "</body>" in html:
         html = html.replace("</body>", tag, 1)
     else:
         html += tag
     with open(path, "w", encoding="utf-8") as f:
         f.write(html)
-    print("Tag ya <script src> imeongezwa kwenye www/index.html.")
+    print("Tags za <script src> zimeongezwa kwenye www/index.html.")
 else:
     print("Tag tayari ipo, hakuna kilichobadilika.")
 PYEOF
