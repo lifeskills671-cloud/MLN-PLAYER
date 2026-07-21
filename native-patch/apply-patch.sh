@@ -4,8 +4,8 @@ set -e
 PKG_PATH="android/app/src/main/java/com/jpplayer/app"
 mkdir -p "$PKG_PATH"
 
-echo "==> Kubandika MediaScannerPlugin.kt na MainActivity.java"
-cp native-patch/MediaScannerPlugin.kt "$PKG_PATH/MediaScannerPlugin.kt"
+echo "==> Kubandika MediaScannerPlugin.java na MainActivity.java"
+cp native-patch/MediaScannerPlugin.java "$PKG_PATH/MediaScannerPlugin.java"
 cp native-patch/MainActivity.java "$PKG_PATH/MainActivity.java"
 
 # Futa MainActivity.java ya default iliyotengenezwa na 'cap add android' kama
