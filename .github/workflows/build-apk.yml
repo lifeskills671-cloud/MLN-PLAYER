@@ -40,12 +40,12 @@ jobs:
 
       - name: Fix Java version mismatch in text-to-speech plugin
         run: |
-          find android/capacitor-community-text-to-speech -name "build.gradle" -exec sed -i \
+          find node_modules/@capacitor-community/text-to-speech -name "build.gradle" -exec sed -i \
             -e 's/JavaVersion\.VERSION_21/JavaVersion.VERSION_17/g' \
             -e 's/sourceCompatibility[[:space:]]*=\?[[:space:]]*21/sourceCompatibility = 17/g' \
             -e 's/targetCompatibility[[:space:]]*=\?[[:space:]]*21/targetCompatibility = 17/g' {} +
           echo "Imesahihishwa (kama faili lilipatikana):"
-          grep -r "Compatibility\|JavaVersion" android/capacitor-community-text-to-speech --include="build.gradle" || echo "Hakuna mistari ya Compatibility ilipatikana."
+          find node_modules/@capacitor-community/text-to-speech -name "build.gradle" -exec grep -H "Compatibility\|JavaVersion" {} \; || echo "Hakuna mistari ya Compatibility ilipatikana."
 
       - name: Make gradlew executable
         run: chmod +x android/gradlew
