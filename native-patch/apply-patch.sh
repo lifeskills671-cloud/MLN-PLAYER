@@ -37,27 +37,27 @@ else:
     print("Ruhusa tayari zipo, hakuna kilichobadilika.")
 PYEOF
 
-echo "==> Kubandika media-scanner-bridge.js ndani ya www/index.html (kabla ya </body>)"
+echo "==> Kunakili media-scanner-bridge.js kama faili tofauti ndani ya www/"
+cp native-patch/media-scanner-bridge.js www/media-scanner-bridge.js
+
+echo "==> Kuongeza <script src> moja tu kabla ya </body> (njia salama, haiguzi JS)"
 python3 - <<'PYEOF'
 path = "www/index.html"
 with open(path, encoding="utf-8") as f:
     html = f.read()
 
-with open("native-patch/media-scanner-bridge.js", encoding="utf-8") as f:
-    bridge_js = f.read()
-
-marker = "<!-- MEDIA_SCANNER_BRIDGE -->"
+marker = "media-scanner-bridge.js"
 if marker not in html:
-    injected = f"<script>\n{bridge_js}\n</script>\n{marker}\n</body>"
+    tag = '<script src="media-scanner-bridge.js"></script>\n</body>'
     if "</body>" in html:
-        html = html.replace("</body>", injected, 1)
+        html = html.replace("</body>", tag, 1)
     else:
-        html += injected
+        html += tag
     with open(path, "w", encoding="utf-8") as f:
         f.write(html)
-    print("Bridge JS imeingizwa kwenye www/index.html.")
+    print("Tag ya <script src> imeongezwa kwenye www/index.html.")
 else:
-    print("Bridge JS tayari ipo, hakuna kilichobadilika.")
+    print("Tag tayari ipo, hakuna kilichobadilika.")
 PYEOF
 
 echo "==> Patch imekamilika."
