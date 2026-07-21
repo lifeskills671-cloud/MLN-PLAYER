@@ -1,23 +1,62 @@
-Error
-java.io.IOException: content://downloads/all_downloads/2191
-	at l.۠۫ۙ.ۚۥ(S16K:213)
-	at l.ۨۥۙ.ۢۥ(W17G:358)
-	at l.ۚۚۗ.۠(6B3T:78)
-	at l.ۚۚۗ.۠(Native Method)
-	at l.ۦ۟ۗ.call(HB37:406)
-	at java.util.concurrent.FutureTask.run(FutureTask.java:328)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1100)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
-	at java.lang.Thread.run(Thread.java:1572)
-Caused by: java.lang.SecurityException: Permission Denial: reading com.android.providers.downloads.DownloadProvider uri content://downloads/all_downloads/2191 from pid=13583, uid=10162 requires android.permission.ACCESS_ALL_DOWNLOADS, or grantUriPermission()
-	at android.os.Parcel.createExceptionOrNull(Parcel.java:2426)
-	at android.os.Parcel.createException(Parcel.java:2410)
-	at android.os.Parcel.readException(Parcel.java:2393)
-	at android.database.DatabaseUtils.readExceptionFromParcel(DatabaseUtils.java:190)
-	at android.database.DatabaseUtils.readExceptionWithFileNotFoundExceptionFromParcel(DatabaseUtils.java:153)
-	at android.content.ContentProviderProxy.openTypedAssetFile(ContentProviderNative.java:780)
-	at android.content.ContentResolver.openTypedAssetFileDescriptor(ContentResolver.java:2029)
-	at android.content.ContentResolver.openAssetFileDescriptor(ContentResolver.java:1844)
-	at android.content.ContentResolver.openInputStream(ContentResolver.java:1520)
-	at l.۠۫ۙ.ۚۥ(S16K:211)
-	... 8 more
+name: Build APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install npm packages
+        run: npm install --legacy-peer-deps
+
+      - name: Add Android platform (Capacitor)
+        run: npx cap add android
+
+      - name: Apply native patch (MediaScanner plugin + permissions + JS bridge)
+        run: bash native-patch/apply-patch.sh
+
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      - name: Fix Java version mismatch in text-to-speech plugin
+        run: |
+          find android/capacitor-community-text-to-speech -name "build.gradle" -exec sed -i \
+            -e 's/JavaVersion\.VERSION_21/JavaVersion.VERSION_17/g' \
+            -e 's/sourceCompatibility[[:space:]]*=\?[[:space:]]*21/sourceCompatibility = 17/g' \
+            -e 's/targetCompatibility[[:space:]]*=\?[[:space:]]*21/targetCompatibility = 17/g' {} +
+          echo "Imesahihishwa (kama faili lilipatikana):"
+          grep -r "Compatibility\|JavaVersion" android/capacitor-community-text-to-speech --include="build.gradle" || echo "Hakuna mistari ya Compatibility ilipatikana."
+
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
+
+      - name: Build debug APK
+        run: |
+          cd android
+          ./gradlew assembleDebug
+
+      - name: Upload APK as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jp-player-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
