@@ -1,6 +1,6 @@
 /* =====================================================================
    media-scanner-bridge.js
-   Ongeza faili hii (au bandika maudhui yake) kabla ya </script> ya mwisho
+   Ongeza faili hii (au bandika maudhui yake) kabla ya mstari wa mwisho wa tag ya script
    ndani ya www/index.html (JP_Player.html), BAADA ya kazi kama
    buildAudioGroups/buildVideoGroups, renderAudioGrid/renderVideoGrid,
    deviceAudioFiles/deviceVideoFiles kuwa zimeshatangazwa.
@@ -86,10 +86,24 @@ async function autoScanDeviceMedia(){
   }
 }
 
-// ---------- 5) Ita auto-scan mara app inapofunguka (ikiwa ni app halisi) ----------
-window.addEventListener('load', () => {
-  if(isNativeApp()) autoScanDeviceMedia();
-});
+// ---------- 5) "Storage Scanner" — auto-scan HUANZA TU mtumiaji akiwasha
+//    swichi ndani ya Mipangilio (storageScannerToggle), siyo kiotomatiki
+//    kila app inapofunguka. Hii inampa mtumiaji udhibiti kamili.
+function wireStorageScannerToggle(){
+  const toggle = document.getElementById('storageScannerToggle');
+  if(!toggle) return;
+  toggle.addEventListener('change', () => {
+    if(!isNativeApp()){
+      setStatus('Storage Scanner inapatikana kwenye app iliyosakinishwa pekee, siyo kwenye kivinjari.', 'err');
+      toggle.checked = false;
+      return;
+    }
+    if(toggle.checked){
+      autoScanDeviceMedia();
+    }
+  });
+}
+wireStorageScannerToggle();
 
 /* =====================================================================
    MAJUKUMU YANAYOBAKI KWAKO (yanahitaji Android Studio + majaribio):
