@@ -19,15 +19,10 @@
 
   if(!isNativeApp()) return; // Kwenye browser ya kawaida, tumia speechSynthesis halisi
 
-  alert('DEBUG: native-tts-shim.js inaendesha. isNativeApp()=' + isNativeApp() + ', Capacitor.Plugins zilizopo: ' + (window.Capacitor && window.Capacitor.Plugins ? Object.keys(window.Capacitor.Plugins).join(', ') : 'HAKUNA window.Capacitor.Plugins'));
-
   let attempts = 0;
   function install(){
     if(!ready()){
       attempts++;
-      if(attempts === 15){ // ~3 sekunde zimepita bila plugin kuonekana
-        alert('DEBUG: plugin ya TextToSpeech haijaonekana kwenye window.Capacitor.Plugins baada ya sekunde 3. Capacitor.Plugins ina: ' + (window.Capacitor && window.Capacitor.Plugins ? Object.keys(window.Capacitor.Plugins).join(', ') : 'window.Capacitor haipo kabisa'));
-      }
       setTimeout(install, 200);
       return;
     }
@@ -56,7 +51,6 @@
         TTS.stop().catch(function(){});
       },
       speak: function(utter){
-        alert('DEBUG: speechSynthesis.speak() imeitwa. Maneno: "' + (utter.text || '').slice(0,40) + '", lugha: ' + utter.lang);
         window.speechSynthesis.speaking = true;
         // Android TTS: rate 0.1–2 kawaida, pitch 0.5–2. Tunabana thamani ili zisivunje plugin.
         const clampedRate = Math.max(0.1, Math.min(2, utter.rate || 1));
@@ -75,7 +69,6 @@
           if(utter.onend) utter.onend();
         }).catch(function(err){
           window.speechSynthesis.speaking = false;
-          alert('DEBUG: TTS.speak() imeshindwa: ' + (err && err.message ? err.message : JSON.stringify(err)));
           if(utter.onerror) utter.onerror(err);
         });
       }
