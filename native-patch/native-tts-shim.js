@@ -52,8 +52,10 @@
       },
       speak: function(utter){
         window.speechSynthesis.speaking = true;
-        // Android TTS: rate 0.1–2 kawaida, pitch 0.5–2. Tunabana thamani ili zisivunje plugin.
-        const clampedRate = Math.max(0.1, Math.min(2, utter.rate || 1));
+        // Kasi imewekwa kudumu kwa 1.0 (sawa na Chrome default) — hatutumii
+        // marekebisho ya rate ya jinsia/athari yaliyokusudiwa kwa speechSynthesis
+        // ya kivinjari pekee.
+        const clampedRate = 1;
         const clampedPitch = Math.max(0.5, Math.min(2, utter.pitch || 1));
         const clampedVolume = Math.max(0, Math.min(1, utter.volume == null ? 1 : utter.volume));
 
